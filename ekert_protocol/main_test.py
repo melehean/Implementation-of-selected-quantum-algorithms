@@ -21,7 +21,7 @@ class EkertTest(unittest.TestCase):
 
         self.assertAlmostEqual(counts['00'] / shots, 1 / 3, decimal_places)
         self.assertAlmostEqual(counts['01'] / shots, 1 / 3, decimal_places)
-        self.assertAlmostEqual(counts['11'] / shots, 1 / 3, decimal_places)
+        self.assertAlmostEqual(counts['10'] / shots, 1 / 3, decimal_places)
 
     def test_entanglement(self):
         shots = 10 ** 6
