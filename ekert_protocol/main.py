@@ -70,7 +70,7 @@ def run(circuit):
         measurement_equality = alice_measure == bob_measure
         if (alice_phase == '00' and bob_phase == '01') or (alice_phase == '01' and bob_phase == '00'):
             # assert alice_measure == bob_measure, "Measurements is not correlated"
-            output_key.append(measurement_equality)
+            output_key.append(alice_measure)
         elif alice_phase == '00':
             if bob_phase == '10':
                 a3b3.append(measurement_equality)
