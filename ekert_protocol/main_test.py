@@ -19,6 +19,7 @@ class EkertTest(unittest.TestCase):
 
         print(counts)
 
+        self.assertEqual(len(counts), 3)
         self.assertAlmostEqual(counts['00'] / shots, 1 / 3, decimal_places)
         self.assertAlmostEqual(counts['01'] / shots, 1 / 3, decimal_places)
         self.assertAlmostEqual(counts['10'] / shots, 1 / 3, decimal_places)
@@ -37,6 +38,7 @@ class EkertTest(unittest.TestCase):
 
         print(counts)
 
+        self.assertEqual(len(counts), 2)
         self.assertAlmostEqual(counts['00'] / shots, 1 / 2, decimal_places)
         self.assertAlmostEqual(counts['11'] / shots, 1 / 2, decimal_places)
 
