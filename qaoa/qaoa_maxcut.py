@@ -9,14 +9,14 @@ def getGraphFromFile():
     return graph
 
 graph = getGraphFromFile()
-qubitNumber = graph.number_of_edges()
-layerNumber = 2
+qubitsNumber = graph.number_of_nodes()
+layersNumber = 2
 shotsNumber = 100
-device = qml.device("default.qubit", wires=qubitNumber, shots=shotsNumber)
+device = qml.device("default.qubit", wires=qubitsNumber, shots=shotsNumber)
 
 
 def U_b(beta):
-    for qubit in range(qubitNumber):
+    for qubit in range(qubitsNumber):
         qml.RX(2*beta, wires=qubit)
 
 def U_c(gamma):
@@ -36,15 +36,15 @@ pauli_z_2 = np.kron(pauli_z, pauli_z, requires_grad=False)
 @qml.qnode(device)
 def circuit(gammas, betas, edge=None):
 
-    for i in range(0,qubitNumber):
+    for i in range(0,qubitsNumber):
         qml.Hadamard(wires=i)
 
-    for i in range(0,layerNumber):
+    for i in range(0,layersNumber):
         U_c(gammas[i])
         U_b(betas[i])
 
     if edge is None:
-        return qml.sample(compBasisMeasurement(range(qubitNumber)))
+        return qml.sample(compBasisMeasurement(range(qubitsNumber)))
 
     return qml.expval(qml.Hermitian(pauli_z_2, wires=edge))
 
@@ -75,7 +75,7 @@ def getOptimizer(optimizerName="GradientDescent", stepSize=0.01):
         return qml.AdagradOptimizer(stepsize=stepSize)
 
 if __name__ == '__main__':
-    params = 0.01*np.random.rand(2, layerNumber)
+    params = 0.01*np.random.rand(2, layersNumber)
     optimizer = getOptimizer(optimizerName="Adam", stepSize=0.4)
     stepNumber = 100
     for i in range(stepNumber):
