@@ -9,6 +9,11 @@ def getGraphFromFile():
     return graph
 
 graph = getGraphFromFile()
+pos = nx.spring_layout(graph)
+nx.draw(graph,pos,with_labels=1)
+labels = nx.get_edge_attributes(graph,'weight')
+nx.draw_networkx_edge_labels(graph,pos,edge_labels=labels)
+
 qubitsNumber = graph.number_of_nodes()
 layersNumber = 2
 shotsNumber = 100
@@ -80,5 +85,6 @@ if __name__ == '__main__':
     stepNumber = 100
     for i in range(stepNumber):
         params = optimizer.step(costFunction, params)
-        print("Results in " + str(i) + " step: " + str(getMaxCutSolution(params)))
     print("Final results: " + str(getMaxCutSolution(params)))
+    drawer = qml.draw(circuit)
+    print(drawer(params[0],params[1]))
