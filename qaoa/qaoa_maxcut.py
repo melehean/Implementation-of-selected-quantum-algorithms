@@ -86,5 +86,17 @@ if __name__ == '__main__':
     for i in range(stepNumber):
         params = optimizer.step(costFunction, params)
     print("Final results: " + str(getMaxCutSolution(params)))
+
+    counters = getMaxCutSolution(params)
+    f = plt.figure()
+    f.set_figwidth(20)
+    f.set_figheight(10)
+    plt.rcParams.update({'font.size': 15})
+    plt.bar(counters.keys(), counters.values())
+    for element in counters:
+        plt.text(element,counters[element],counters[element])
+    plt.xticks(range(0,2**qubitsNumber))
+    plt.show()
+
     drawer = qml.draw(circuit)
     print(drawer(params[0],params[1]))
