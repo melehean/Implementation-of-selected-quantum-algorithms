@@ -21,20 +21,18 @@ def circuit_Z(params):
 @qml.qnode(dev)
 def circuit_Y(params):
     ansatz(params)
-    qml.RX(np.pi/2,wires=2)
-    return qml.expval(qml.PauliZ(2))
+    return qml.expval(qml.PauliY(2))
 
 @qml.qnode(dev)
 def circuit_X(params):
     ansatz(params)
-    qml.RY(-np.pi/2,wires=1)
-    return qml.expval(qml.PauliZ(1))
+    return qml.expval(qml.PauliX(1))
 
 def cost(params):
     z_expectation = circuit_Z(params)
     y_expectation = circuit_Y(params)
     x_expectation = circuit_X(params)
-    return z_expectation + 2*x_expectation + 3*y_expectation
+    return z_expectation + 5*x_expectation + 2*y_expectation
 
 def getExactValue():
     X = np.array([[0,1],
@@ -47,10 +45,11 @@ def getExactValue():
     eigenValues, eigenVectors = LA.eig(H)
     return np.amin(eigenValues).real
 
-def main():
+
+if __name__ == '__main__':
     params = np.random.normal(0, np.pi, (3)) 
 
-    optimizer = qml.GradientDescentOptimizer(stepsize=0.4)
+    optimizer = qml.NesterovMomentumOptimizer(stepsize=0.4)
     stepNumber = 100
 
     for i in range(stepNumber):
@@ -59,8 +58,11 @@ def main():
 
     print("Final value: " + str(cost(params)))
     print("Exact value: " + str(getExactValue()))
-    
 
-if __name__ == '__main__':
-    main()
+    drawer = qml.draw(circuit_X)
+    print(drawer(params))
+    drawer = qml.draw(circuit_Y)
+    print(drawer(params))
+    drawer = qml.draw(circuit_Z)
+    print(drawer(params))
 

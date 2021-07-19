@@ -94,9 +94,8 @@ def getOptimizer(optimizerName="GradientDescent", stepSize=0.01):
         return qml.NesterovMomentumOptimizer(stepsize=stepSize)
     if optimizerName == "Adagrad":
         return qml.AdagradOptimizer(stepsize=stepSize)
-    
 
-def main():
+if __name__ == '__main__':
     deviceName = "default.qubit" #qiskit.aer
     ansatzName = "usscd"
 
@@ -107,6 +106,13 @@ def main():
     energies = []
     exactEnergies = []
     accuracies = []
+
+    distance = 0.75
+    hamiltonian, qubitsNumber = getMoleculeHamiltonianCircuit(distance, 'jordan_wigner')
+    print("Number of qubits = ", qubitsNumber)
+    print()
+    print("Hamiltonian for distance ", distance)
+    print(hamiltonian)
 
     for distance in distances:
         hamiltonian, qubitsNumber = getMoleculeHamiltonianCircuit(distance, 'jordan_wigner')
@@ -135,9 +141,3 @@ def main():
     plt.show()
     plt.plot(distances, accuracies)
     plt.show()
-
-
-if __name__ == '__main__':
-    main()
-
-
