@@ -7,8 +7,8 @@ from sklearn.preprocessing import minmax_scale
 from sklearn.model_selection import train_test_split
 
 data = datasets.load_iris()
-X = data['data']
-Y = data['target']
+X = data.data
+Y = data.target
 qubits_number = len(X[0])
 device = qml.device("default.qubit", wires=qubits_number)
 
@@ -53,7 +53,7 @@ def count_loss(list_1, list_2):
 
 
 def loss(variables, shift_array, input, expected_results):
-    predictions = [qnn(variables, shift_array, x) for x in input]
+    predictions = np.array([qnn(variables, shift_array, x) for x in input])
     return count_loss(predictions, expected_results)
 
 
@@ -81,9 +81,9 @@ def change_predictions_to_classes(predictions, threshold):
     return predictions
 
 def accuracy(variables, shift_array, input, expected_results, threshold):
-    predictions = [qnn(variables, shift_array, x) for x in input]
+    predictions = np.array([qnn(variables, shift_array, x) for x in input])
 
-    predictions = minmax_scale(predictions, feature_range=(0, 1))
+    predictions = (predictions + 1.0)/2.0
     predictions = change_predictions_to_classes(predictions, threshold)
 
     accuracy_count = 0
@@ -99,34 +99,42 @@ def main():
     X = X[Y<=1]
     Y = Y[Y<=1]
 
-    seed = 123
+    seed = 0
+    np.random.seed(0)
 
     X = minmax_scale(X, feature_range=(0, 2*np.pi))
 
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=seed, shuffle=True, stratify=Y)
     
-    Y_train = 1-2*Y_train
+    Y_train_scaled = np.empty_like(Y_train)
+    Y_train_scaled[Y_train == 0] = -1
+    Y_train_scaled[Y_train == 1] = +1
 
-    layers_number = 1
-    shift_array = [1,2]
-    batch_size = 10
-    epochs = len(X_train)//batch_size
+    layers_number = 3
+    shift_array = [1,2,3]
+    batch_size = 5
+    batches_number = len(X_train)//batch_size
+    epochs_number = 6
     
-    variables = [0.1 * np.random.randn(layers_number, qubits_number, 3), 0.0]
+    weights = 0.01 * np.random.randn(layers_number, qubits_number, 3)
+    bias = 0.0
+    variables = [weights, bias]
 
-    optimizer = qml.GradientDescentOptimizer(stepsize=0.4)
+    optimizer = qml.AdamOptimizer()
 
     X_batches = devide_into_batches(X_train, batch_size)
-    Y_batches = devide_into_batches(Y_train, batch_size)
-        
-    for iteration in range(epochs):
-        batch_cost = lambda help_variables: loss(help_variables, shift_array, X_batches[iteration], Y_batches[iteration])
-        variables = optimizer.step(batch_cost, variables)
-        
-        print("Iteration", str(iteration))
+    Y_batches = devide_into_batches(Y_train_scaled, batch_size)
+
+    for epoch in range(epochs_number):
+        print("Epoch:", epoch)
+            
+        for iteration in range(batches_number):
+            batch_cost = lambda help_variables: loss(help_variables, shift_array, X_batches[iteration], Y_batches[iteration])
+            variables = optimizer.step(batch_cost, variables)
+            
+            print("Iteration", str(iteration))
 
     accuracy_test_value = accuracy(variables, shift_array, X_test, Y_test, threshold=0.5)
-    Y_train = 0.5*(1-Y_train)
     accuracy_train_value = accuracy(variables, shift_array, X_train, Y_train, threshold=0.5)
 
     print("Accuracy in train set:", accuracy_train_value)
