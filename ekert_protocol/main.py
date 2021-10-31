@@ -81,10 +81,10 @@ def run(circuit):
                 a1b3.append(measurement_equality)
             elif bob_phase == '10':
                 a1b1.append(measurement_equality)
-    e_a3b3 = sum(a3b3) / len(a3b3)
-    e_a3b1 = sum(a3b1) / len(a3b1)
-    e_a1b3 = sum(a1b3) / len(a1b3)
-    e_a1b1 = sum(a1b1) / len(a1b1)
+    e_a3b3 = 2 * sum(a3b3) / len(a3b3) - 1
+    e_a3b1 = 2 * sum(a3b1) / len(a3b1) - 1
+    e_a1b3 = 2 * sum(a1b3) / len(a1b3) - 1
+    e_a1b1 = 2 * sum(a1b1) / len(a1b1) - 1
     print([e_a3b3, e_a3b1, e_a1b3, e_a1b1])
     security_check = e_a3b3 + e_a3b1 + e_a1b3 - e_a1b1
     assert security_check >= 2, "Channel is not secure: " + str(security_check)
